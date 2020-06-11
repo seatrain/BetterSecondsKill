@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:33066/bettersecondskill?serverTimezone=Hongkong
+    username: root
+    password: root
+    druid:
+      initial-size: 1 # 初始化时建立物理连接的个数
+      max-active: 30 # 最大连接池数量，相当于maxPoolSize
+      min-idle: 20 # 最小连接池数量，相当于minPoolSize
+      max-wait: 6000 # 获取连接时最大的等待时间，单位为毫秒
+      pool-prepared-statements: false # 是否缓存preparedStatement
+      validation-query: SELECT 1 FROM dual # 用来检测连接是否有效的sql
+      validation-query-timeout: 3 # 单位为秒，检测连接是否有效的超时时间
+      test-on-borrow: true # 申请连接时执行ValidateQuery检测
+      test-on-return: false # 归还连接时执行ValidateQuery检测
+      test-while-idle: true # 申请连接时检测，如果空闲时间大于timeBetweenEvictionRunsMillis， 执行ValidateQuery检测连接是否有效
+      time-between-eviction-runs-millis: 60000 # 默认为1分钟，Destroy线程会检测连接的间隔时间，如果连接空闲时间大于等于minEvictableIdleTimeMillis则关闭物理连接
+      min-evictable-idle-time-millis: 30000 # 保持空闲连接而不被驱逐的最 小时间
+      filters: stat,wall # 需开启的插件
+      web-stat-filter:
+        enabled: true # 开启web-stat-filter对接口的监控
+        url-pattern: /* # 被监控的接口的url
+        exclusions: "*.js,*.gif, *.jpg,*.png,*.css,*.ico,/druid/*" # 排查对于静态资源和druid显示界面的监控
+        session-stat-enable: true # 是否开启session统计功能
+        session-stat-max-count: 1000 # session的最大数量
+        profile-enable: true # 监控单个url调用的sql列表
+      stat-view-servlet:
+        enabled: true # 开启对于监控页面的访问
+        url-pattern: /druid/* # 访问url模式
+        reset-enable: true # 是否可重置数据
+        login-username: admin # 登录用户名
+        login-password: 123456 # 登录用户密码
+        allow: 127.0.0.1 # 允许访问的ip白名单
+        deny: 192.168.0.114 # 允许访问的ip黑名单，黑名单优先级高于白名单
+  redis:
+    database: 0
+    timeout: 200
+    port: 6379
+    host: localhost
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1
