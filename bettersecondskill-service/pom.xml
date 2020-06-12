@@ -12,6 +12,30 @@
   <artifactId>bettersecondskill-service</artifactId>
   <name>service</name>
   <description>service依赖包</description>
-  <version>${service.version}</version>
+  <version>0.0.1-SNAPSHOT</version>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>2.2.6.RELEASE</version>
+        <configuration>
+          <classifier>exec</classifier>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**/*.yml</include>
+          <include>**/*.properties</include>
+          <include>**/*.xml</include>
+        </includes>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
+  </build>
 </project>
