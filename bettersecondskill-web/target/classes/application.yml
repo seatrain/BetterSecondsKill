@@ -1,9 +1,0 @@
-spring:
-  profiles:
-    active: dev
-server:
-  port: 10001
-
-zookeeper:
-  address: localhost:2181
-  timeout: 200000
