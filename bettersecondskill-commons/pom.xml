@@ -12,6 +12,17 @@
   <artifactId>bettersecondskill-commons</artifactId>
   <name>commons</name>
   <description>工具类依赖包</description>
-  <version>${common.version</version>
+  <version>0.0.1-SNAPSHOT</version>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <classifier>exec</classifier>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

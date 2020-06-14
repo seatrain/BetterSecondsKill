@@ -40,6 +40,13 @@
   </properties>
 
   <dependencies>
+
+    <dependency>
+      <groupId>com.seatrain</groupId>
+      <artifactId>bettersecondskill-commons</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+
     <!--===========SpringBoot Start===========-->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -170,6 +177,12 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.13</version>
     </dependency>
     <!--===========Utils End===========-->
   </dependencies>
