@@ -35,7 +35,7 @@ public class ZookeeperConfig {
 
       countDownLatch.await();
       long endTime = System.currentTimeMillis();
-      log.info("【初始化ZooKeeper连接状态....】={}, 总共花费时间={}s", zooKeeper.getState(), (endTime - startTime) / 1000);
+      log.info("【初始化ZooKeeper连接状态....】={}, 总共花费时间={}s", zooKeeper.getState(), (endTime - startTime) / 1000f);
 
     } catch (Exception e) {
       log.error("初始化ZooKeeper连接异常....】={}", e);

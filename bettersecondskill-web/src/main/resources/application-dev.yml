@@ -49,4 +49,6 @@ mybatis-plus:
   generator-moudle-name: com.seatrain.bettersecondskill.function
   mapperXmlPath: /src/main/resources/mapper/
   projectPath: bettersecondskill-service
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 

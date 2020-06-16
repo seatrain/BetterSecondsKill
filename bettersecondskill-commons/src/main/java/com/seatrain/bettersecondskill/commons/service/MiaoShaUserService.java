@@ -1,6 +1,9 @@
 package com.seatrain.bettersecondskill.commons.service;
 
+import com.seatrain.bettersecondskill.commons.dto.LoginDTO;
 import com.seatrain.bettersecondskill.commons.dto.UserDTO;
+import com.seatrain.bettersecondskill.commons.entity.MiaoShaUser;
+import javax.servlet.http.HttpServletResponse;
 
 public interface MiaoShaUserService {
 
@@ -18,4 +21,14 @@ public interface MiaoShaUserService {
    * @return 用户id
    */
   Integer create(UserDTO userDTO);
+
+  void login(LoginDTO loginDTO, HttpServletResponse response);
+
+  /**
+   * 根据token获取当前登录用户的信息
+   *
+   * @param token token
+   * @return 当前登录用户
+   */
+  MiaoShaUser getByToken(String token);
 }
