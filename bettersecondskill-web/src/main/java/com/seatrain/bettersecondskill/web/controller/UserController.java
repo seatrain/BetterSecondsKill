@@ -54,10 +54,8 @@ public class UserController {
   @ApiOperation(value = "获取当前登录用户的信息")
   @GetMapping(value = "/getOnlineUser", produces = MediaType.APPLICATION_JSON_VALUE)
   public CustomizedResponseEntity<MiaoShaUser> getOnlineUser(
-      @ApiParam(hidden = true)
-      MiaoShaUser onlineUser
+      @ApiParam(hidden = true) MiaoShaUser onlineUser
   ) {
-
     return CustomizedResponseEntity.ok(onlineUser);
   }
 }

@@ -1,5 +1,6 @@
 package com.seatrain.bettersecondskill.web.config;
 
+import io.swagger.annotations.ApiOperation;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -7,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
@@ -39,7 +41,7 @@ public class Swagger2Config {
         .apiInfo(outerApiInfo())
         .select()
         //.apis(MutipartBasePackageUtil.basePackage("ServerUser.rolePermission.controller"))
-        .apis(MutipartBasePackageUtil.basePackage("com.seatrain.bettersecondskill.web.controller,com.seatrain.bettersecondskill.function.controller"))
+        .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
         .paths(PathSelectors.any())
         .build();
   }

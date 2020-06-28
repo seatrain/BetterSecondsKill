@@ -71,7 +71,7 @@ public class MPServiceImpl implements MPService {
     // 包配置
     PackageConfig pc = new PackageConfig();
     pc.setParent(moudleName);
-    pc.setEntity("entity.do");
+    pc.setEntity("entity.DO");
     pc.setService("service");
     pc.setMapper("mapper");
     mpg.setPackageInfo(pc);
