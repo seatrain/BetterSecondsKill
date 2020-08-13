@@ -15,11 +15,17 @@ import com.seatrain.bettersecondskill.function.redisManage.RedisClient;
 import com.seatrain.bettersecondskill.function.redisManage.keysBean.MiaoShaUserKey;
 import com.seatrain.bettersecondskill.function.service.UserService;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 @Service
 public class MiaoShaUserServiceImpl implements MiaoShaUserService {
@@ -90,8 +96,59 @@ public class MiaoShaUserServiceImpl implements MiaoShaUserService {
   @Override
   public MiaoShaUser getByToken(String token) {
     User user = redisClient.get(MiaoShaUserKey.getToken(), token, User.class);
-    MiaoShaUser result = new MiaoShaUser();
-    BeanUtils.copyProperties(user, result);
-    return result;
+    if (user != null) {
+      MiaoShaUser result = new MiaoShaUser();
+      BeanUtils.copyProperties(user, result);
+      return result;
+    }
+
+    return null;
+  }
+
+  @Override
+  public void logout(HttpServletRequest request, HttpServletResponse response) {
+    String token = getToken(request);
+
+    // 从缓存中删除
+    redisClient.delete(MiaoShaUserKey.getToken(), token);
+
+    // 删除cookie
+    Cookie cookie = new Cookie(LoginConstant.TOKEN, token);
+    cookie.setMaxAge(0);
+    cookie.setPath("/");
+    response.addCookie(cookie);
+  }
+
+  @Override
+  public String getToken(HttpServletRequest request) {
+    String paramToken = request.getParameter(LoginConstant.TOKEN);
+
+    // 从cookie中获取token
+    Cookie[] cookies = request.getCookies();
+    List<String> cookieList = Arrays.stream(cookies)
+        .filter(item -> item.getName().equals(LoginConstant.TOKEN))
+        .map(item -> item.getValue())
+        .collect(Collectors.toList());
+    String cookieToken = CollectionUtils.isEmpty(cookieList) ? null : cookieList.get(0);
+
+    if (StringUtils.isEmpty(paramToken) && StringUtils.isEmpty(cookieToken)) {
+      return null;
+    }
+
+    // 请求参数中的token优先于cookie中的token
+    String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
+    return token;
+  }
+
+  @Override
+  public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    String token = getToken(request);
+    MiaoShaUser miaoShaUser = getByToken(token);
+    redisClient.set(MiaoShaUserKey.getToken(), token, miaoShaUser);
+
+    Cookie cookie = new Cookie(LoginConstant.TOKEN, token);
+    cookie.setMaxAge(LoginConstant.TOKEN_EXPIRE);
+    cookie.setPath("/");
+    response.addCookie(cookie);
   }
 }

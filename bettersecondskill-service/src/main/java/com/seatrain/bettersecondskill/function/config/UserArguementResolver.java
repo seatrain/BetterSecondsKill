@@ -4,7 +4,6 @@ import com.seatrain.bettersecondskill.commons.constant.LoginConstant;
 import com.seatrain.bettersecondskill.commons.entity.MiaoShaUser;
 import com.seatrain.bettersecondskill.commons.exception.UserNotLoginException;
 import com.seatrain.bettersecondskill.commons.service.MiaoShaUserService;
-import com.seatrain.bettersecondskill.function.redisManage.RedisClient;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,6 +47,9 @@ public class UserArguementResolver implements HandlerMethodArgumentResolver {
     }
 
     MiaoShaUser result = miaoShaUserService.getByToken(token);
+    if (result == null) {
+      throw new UserNotLoginException();
+    }
     return result;
   }
 }

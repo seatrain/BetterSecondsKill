@@ -8,7 +8,7 @@ import com.seatrain.bettersecondskill.commons.service.MiaoShaUserService;
 import com.seatrain.bettersecondskill.web.http.CustomizedResponseEntity;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Api(value = "用户管理")
 @Slf4j
@@ -54,8 +55,19 @@ public class UserController {
   @ApiOperation(value = "获取当前登录用户的信息")
   @GetMapping(value = "/getOnlineUser", produces = MediaType.APPLICATION_JSON_VALUE)
   public CustomizedResponseEntity<MiaoShaUser> getOnlineUser(
-      @ApiParam(hidden = true) MiaoShaUser onlineUser
+      @ApiIgnore MiaoShaUser onlineUser
   ) {
     return CustomizedResponseEntity.ok(onlineUser);
+  }
+
+  @ApiOperation(value = "用户退出")
+  @PostMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomizedResponseEntity<String> logout(
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) {
+    miaoShaUserService.logout(request, response);
+
+    return CustomizedResponseEntity.ok("success");
   }
 }
