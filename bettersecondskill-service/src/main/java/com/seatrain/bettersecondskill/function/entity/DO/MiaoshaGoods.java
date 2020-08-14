@@ -7,45 +7,38 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-
 /**
  * <p>
- *
+ * 秒杀商品表
  * </p>
  *
  * @author longshibin
- * @since 2020-06-28
+ * @since 2020-08-14
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("t_goods")
-@ApiModel(value = "Goods对象", description = "")
-public class Goods implements Serializable {
+@TableName("miaosha_goods")
+@ApiModel(value = "MiaoshaGoods对象", description = "秒杀商品表")
+public class MiaoshaGoods implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   @TableId(value = "id", type = IdType.AUTO)
   private Long id;
 
-  @ApiModelProperty(value = "商品名称")
-  private String name;
+  private Long goodsId;
 
-  @ApiModelProperty(value = "商品标题")
-  private String title;
+  private BigDecimal miaoshaPrice;
 
-  @ApiModelProperty(value = "商品描述")
-  private String detail;
+  @ApiModelProperty(value = "秒杀开始时间")
+  private LocalDateTime startDate;
 
-  @ApiModelProperty(value = "价格")
-  private BigDecimal price;
-
-  @ApiModelProperty(value = "库存")
-  private Integer stock;
-
-
+  @ApiModelProperty(value = "秒杀结束时间")
+  private LocalDateTime endDate;
 }

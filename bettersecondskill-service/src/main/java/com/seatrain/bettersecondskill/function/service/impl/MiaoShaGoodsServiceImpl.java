@@ -1,70 +1,70 @@
 package com.seatrain.bettersecondskill.function.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.seatrain.bettersecondskill.commons.dto.GoodsDTO;
-import com.seatrain.bettersecondskill.commons.entity.GoodsVo;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seatrain.bettersecondskill.commons.dto.MiaoshaGoodsDTO;
+import com.seatrain.bettersecondskill.commons.entity.MiaoshaoGoodsVo;
+import com.seatrain.bettersecondskill.commons.exception.InternalException;
 import com.seatrain.bettersecondskill.commons.service.MiaoShaGoodsService;
 import com.seatrain.bettersecondskill.function.entity.DO.Goods;
-import com.seatrain.bettersecondskill.function.redisManage.RedisClient;
-import com.seatrain.bettersecondskill.function.redisManage.keysBean.MiaoShaGoodsKey;
+import com.seatrain.bettersecondskill.function.entity.DO.MiaoshaGoods;
+import com.seatrain.bettersecondskill.function.mapper.MiaoshaGoodsMapper;
 import com.seatrain.bettersecondskill.function.service.GoodsService;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-public class MiaoShaGoodsServiceImpl implements MiaoShaGoodsService {
+public class MiaoShaGoodsServiceImpl extends ServiceImpl<MiaoshaGoodsMapper, MiaoshaGoods> implements MiaoShaGoodsService {
 
   @Autowired
   private GoodsService goodsService;
 
-  @Autowired
-  private RedisClient redisClient;
-
+  @Transactional(rollbackFor = Exception.class)
   @Override
-  public Integer create(GoodsDTO goodsDTO) {
-    Goods goods = new Goods();
-    BeanUtils.copyProperties(goodsDTO, goods);
-    goodsService.save(goods);
-
-    if (!redisClient.set(MiaoShaGoodsKey.goodsInfo(), String.valueOf(goods.getId()), goods)) {
-      log.error("商品id为：{}的详情未存入缓存中！", goods.getId());
-    }
-    return goods.getId();
-  }
-
-  @Override
-  public GoodsVo selectInfo(Integer id) {
-    Goods goods = redisClient.get(MiaoShaGoodsKey.goodsInfo(), String.valueOf(id), Goods.class);
+  public Long create(MiaoshaGoodsDTO miaoshaGoodsDTO) {
+    Goods goods = goodsService.getById(miaoshaGoodsDTO.getGoodsId());
     if (goods == null) {
-      goods = goodsService.getById(id);
-      redisClient.set(MiaoShaGoodsKey.goodsInfo(), String.valueOf(id), goods);
+      throw new InternalException(String.format("商品%d不存在:", miaoshaGoodsDTO.getGoodsId()));
     }
-    GoodsVo goodsVo = new GoodsVo();
-    BeanUtils.copyProperties(goods, goodsVo);
-    return goodsVo;
+    MiaoshaGoods miaoshaGoods = new MiaoshaGoods();
+    miaoshaGoods.setGoodsId(goods.getId());
+    miaoshaGoods.setMiaoshaPrice(miaoshaGoodsDTO.getMiaoshaPrice());
+    miaoshaGoods.setStartDate(miaoshaGoodsDTO.getStartDate());
+    miaoshaGoods.setEndDate(miaoshaGoodsDTO.getEndDate());
+
+    boolean result = save(miaoshaGoods);
+    if (!result) {
+      throw new InternalException("创建秒杀商品失败:" + miaoshaGoodsDTO.toString());
+    }
+    log.info("创建秒杀商品成功:{}", miaoshaGoods.toString());
+
+    return miaoshaGoods.getId();
   }
 
   @Override
-  public List<GoodsVo> selectList() {
-    List<Goods> goodsList = goodsService.list(new QueryWrapper<>());
+  public MiaoshaoGoodsVo getVoByGoodsId(long goodsId) {
+    QueryWrapper<MiaoshaGoods> queryWrapper = new QueryWrapper<>();
+    queryWrapper.lambda()
+        .eq(MiaoshaGoods::getGoodsId, goodsId);
+    MiaoshaGoods miaoshaGoods = getOne(queryWrapper);
 
-    if (CollectionUtils.isEmpty(goodsList)) {
-      return new ArrayList<>(0);
-    }
+    MiaoshaoGoodsVo miaoshaoGoodsVo = new MiaoshaoGoodsVo();
+    BeanUtils.copyProperties(miaoshaGoods, miaoshaoGoodsVo);
 
-    List<GoodsVo> goodsVoList = new ArrayList<>(goodsList.size());
-    goodsList
-        .forEach(item -> {
-          GoodsVo goodsVo = new GoodsVo();
-          BeanUtils.copyProperties(item, goodsVo);
-          goodsVoList.add(goodsVo);
-        });
-    return goodsVoList;
+    return miaoshaoGoodsVo;
+  }
+
+  @Override
+  public MiaoshaoGoodsVo getVoById(long id) {
+    MiaoshaGoods miaoshaGoods = getById(id);
+
+    MiaoshaoGoodsVo miaoshaoGoodsVo = new MiaoshaoGoodsVo();
+    BeanUtils.copyProperties(miaoshaGoods, miaoshaoGoodsVo);
+
+    return miaoshaoGoodsVo;
   }
 }

@@ -1,31 +1,31 @@
 package com.seatrain.bettersecondskill.commons.service;
 
-import com.seatrain.bettersecondskill.commons.dto.GoodsDTO;
-import com.seatrain.bettersecondskill.commons.entity.GoodsVo;
-import java.util.List;
+import com.seatrain.bettersecondskill.commons.dto.MiaoshaGoodsDTO;
+import com.seatrain.bettersecondskill.commons.entity.MiaoshaoGoodsVo;
 
 public interface MiaoShaGoodsService {
 
   /**
-   * 创建商品
+   * 根据商品id生成对应的秒杀商品
    *
-   * @param goodsDTO 商品创建信息
-   * @return 商品id
+   * @param miaoshaGoodsDTO 秒杀商品创建参数
+   * @return 生成的秒杀商品的id
    */
-  Integer create(GoodsDTO goodsDTO);
+  Long create(MiaoshaGoodsDTO miaoshaGoodsDTO);
 
   /**
-   * 查看商品详情
+   * 根据商品id获取对应的秒杀商品vo
    *
-   * @param id 商品id
-   * @return 商品详情实体类
+   * @param goodsId 商品id
+   * @return 秒杀商品vo
    */
-  GoodsVo selectInfo(Integer id);
+  MiaoshaoGoodsVo getVoByGoodsId(long goodsId);
 
   /**
-   * 查看商品列表
+   * 根据id获取对应的秒杀商品vo
    *
-   * @return 商品详情实体类列表
+   * @param id id
+   * @return 秒杀商品vo
    */
-  List<GoodsVo> selectList();
+  MiaoshaoGoodsVo getVoById(long id);
 }
