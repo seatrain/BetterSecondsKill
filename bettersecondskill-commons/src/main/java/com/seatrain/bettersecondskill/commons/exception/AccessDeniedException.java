@@ -8,4 +8,9 @@ public class AccessDeniedException extends AbstractCutomizedExcetpion {
     super("用户无权访问或服务器拒绝");
     setHttpStatus(HttpStatus.FORBIDDEN.value());
   }
+
+  public AccessDeniedException(String message) {
+    super(message);
+    setHttpStatus(HttpStatus.FORBIDDEN.value());
+  }
 }

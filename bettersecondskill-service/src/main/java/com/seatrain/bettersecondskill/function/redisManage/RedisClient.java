@@ -1,6 +1,9 @@
 package com.seatrain.bettersecondskill.function.redisManage;
 
 import com.google.gson.Gson;
+import com.seatrain.bettersecondskill.function.redisManage.script.CustomizedRedisScript;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +21,10 @@ public class RedisClient {
   private JedisPool jedisPool;
 
   @Autowired
-  Gson gson;
+  private CustomizedRedisScript<Long> limitScript;
+
+  @Autowired
+  private Gson gson;
 
   /**
    * 向缓存中设置对象
@@ -263,4 +269,30 @@ public class RedisClient {
     }
   }
 
+  public Long executeLimitScript(String keyName, int exprireSeconds) {
+    Jedis jedis = null;
+    try {
+      jedis = jedisPool.getResource();
+
+      List<String> keyList = new ArrayList<>(2);
+      keyList.add(keyName);
+      keyList.add(String.valueOf(exprireSeconds));
+      Object result = null;
+      try {
+        result = jedis.evalsha(limitScript.getSha1(), keyList, new ArrayList<>(0));
+      } catch (Exception e) {
+        if (e.getMessage().startsWith("value sent to redis cannot be") || e.getMessage().startsWith("NOSCRIPT No matching script")) {
+          String sha1 = jedis.scriptLoad(limitScript.getScriptAsString());
+          limitScript.setSha1(sha1);
+          result = jedis.evalsha(limitScript.getSha1(), keyList, new ArrayList<>(0));
+        } else {
+          throw e;
+        }
+      }
+
+      return (Long) result;
+    } finally {
+      returnResource(jedis);
+    }
+  }
 }

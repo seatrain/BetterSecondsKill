@@ -3,6 +3,7 @@ package com.seatrain.bettersecondskill.web.controller;
 import com.seatrain.bettersecondskill.commons.dto.MiaoshaGoodsDTO;
 import com.seatrain.bettersecondskill.commons.entity.MiaoshaoGoodsVo;
 import com.seatrain.bettersecondskill.commons.service.MiaoShaGoodsService;
+import com.seatrain.bettersecondskill.function.access.UserCheckAndLimit;
 import com.seatrain.bettersecondskill.web.http.CustomizedResponseEntity;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,6 +50,7 @@ public class MiaoshaGoodsController {
     return CustomizedResponseEntity.ok(miaoshaoGoodsVo);
   }
 
+  @UserCheckAndLimit(seconds = 60, maxCount = 5)
   @ApiOperation(value = "根据id获取对应的秒杀商品信息")
   @GetMapping(value = "/getById", produces = MediaType.APPLICATION_JSON_VALUE)
   public CustomizedResponseEntity<MiaoshaoGoodsVo> getById(
