@@ -1,13 +1,14 @@
 package com.seatrain.bettersecondskill.web.controller;
 
 import com.seatrain.bettersecondskill.commons.entity.MiaoShaUser;
+import com.seatrain.bettersecondskill.commons.exception.BadRequestException;
 import com.seatrain.bettersecondskill.commons.exception.InternalException;
 import com.seatrain.bettersecondskill.function.service.CodeService;
+import com.seatrain.bettersecondskill.web.http.CustomizedResponseEntity;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -51,5 +52,24 @@ public class CodeController {
       log.error(e.getMessage(), e);
       throw new InternalException("二维码生成出错：" + e.getMessage());
     }
+  }
+
+  @ApiOperation(value = "获取秒杀路径")
+  @GetMapping(value = "/getMiaoShaPath", produces = MediaType.APPLICATION_JSON_VALUE)
+  public CustomizedResponseEntity<String> getMiaoShaPath(
+      @ApiParam(value = "商品id", required = true)
+      @RequestParam long goodsId,
+
+      @ApiParam(value = "验证码", required = true)
+      @RequestParam String verificationCode,
+      @ApiIgnore MiaoShaUser miaoShaUser
+  ) {
+    if (!codeService.checkVerificationCode(miaoShaUser, goodsId, verificationCode)) {
+      throw new BadRequestException("验证码错误!");
+    }
+
+    String miaoShaPath = codeService.getMiaoShaPath(miaoShaUser, goodsId);
+
+    return CustomizedResponseEntity.ok(miaoShaPath);
   }
 }

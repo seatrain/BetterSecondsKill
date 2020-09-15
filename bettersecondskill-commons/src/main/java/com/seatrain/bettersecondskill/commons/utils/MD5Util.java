@@ -10,7 +10,7 @@ public class MD5Util {
   /**
    * md5加密方法
    */
-  private static String md5(String s) {
+  public static String md5(String s) {
     return DigestUtils.md5Hex(s);
   }
 

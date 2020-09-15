@@ -1,6 +1,8 @@
 package com.seatrain.bettersecondskill.function.service.impl;
 
 import com.seatrain.bettersecondskill.commons.entity.MiaoShaUser;
+import com.seatrain.bettersecondskill.commons.exception.BadRequestException;
+import com.seatrain.bettersecondskill.commons.utils.MD5Util;
 import com.seatrain.bettersecondskill.function.redisManage.RedisClient;
 import com.seatrain.bettersecondskill.function.redisManage.keysBean.CodeKey;
 import com.seatrain.bettersecondskill.function.service.CodeService;
@@ -8,12 +10,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
 import java.util.Random;
-import javax.imageio.ImageIO;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -44,7 +46,7 @@ public class CodeServiceImpl implements CodeService {
   }
 
   @Override
-  public BufferedImage getVerificationCode(MiaoShaUser miaoShaUser, long goodId) {
+  public BufferedImage getVerificationCode(MiaoShaUser miaoShaUser, long goodsId) {
     // BufferedImage类是具有缓冲区的Image类,Image类是用于描述图像信息的类
     BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_BGR);
 
@@ -71,21 +73,10 @@ public class CodeServiceImpl implements CodeService {
       randomString = drawString(graphics, randomString, i);
     }
 
-    log.info("用户：{}，商品：{}的对应验证码为：{}", miaoShaUser.getName(), goodId, randomString);
+    log.info("用户：{}，商品：{}的对应验证码为：{}", miaoShaUser.getName(), goodsId, randomString);
     graphics.dispose();
 
-    redisClient.set(CodeKey.verificationCode(), miaoShaUser.getName() + ":" + goodId, randomString);
-
-//    //输出图片
-//    try {
-//      FileOutputStream fileOutputStream = new FileOutputStream("C:\\Users\\Administrator\\Pictures\\test3.png");
-//      ImageIO.write(image, "jpg", fileOutputStream);
-//      fileOutputStream.flush();
-//      fileOutputStream.close();
-//    }catch (Exception e) {
-//      log.error(e.getMessage(), e);
-//    }
-
+    redisClient.set(CodeKey.verificationCode(), miaoShaUser.getName() + ":" + goodsId, randomString);
     return image;
   }
 
@@ -137,5 +128,45 @@ public class CodeServiceImpl implements CodeService {
    */
   public String getRandomString(int num) {
     return String.valueOf(RANDOM_String.charAt(num));
+  }
+
+  @Override
+  public String getMiaoShaPath(MiaoShaUser miaoShaUser, long goodsId) {
+    String uuid = UUID.randomUUID().toString().replace("-", "");
+
+    String md5 = MD5Util.md5(uuid + "dbqaq123");
+    redisClient.set(CodeKey.miaoShaPath(), miaoShaUser.getName() + ":" + goodsId, md5);
+    log.info("用户：{}，商品：{}的对应秒杀路径为：{}", miaoShaUser.getName(), goodsId, md5);
+    return md5;
+  }
+
+  @Override
+  public boolean checkVerificationCode(MiaoShaUser miaoShaUser, long goodsId, String verificationCode) {
+    if (StringUtils.isEmpty(verificationCode)) {
+      throw new BadRequestException("验证码为空!");
+    }
+
+    String value = redisClient.get(CodeKey.verificationCode(), miaoShaUser.getName() + ":" + goodsId, String.class);
+
+    if (verificationCode.equals(value)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  @Override
+  public boolean checkMiaoShaPath(MiaoShaUser miaoShaUser, long goodsId, String miaoShaPath) {
+    if (StringUtils.isEmpty(miaoShaPath)) {
+      throw new BadRequestException("秒杀路径为空!");
+    }
+
+    String value = redisClient.get(CodeKey.miaoShaPath(), miaoShaUser.getName() + ":" + goodsId, String.class);
+
+    if (miaoShaPath.equals(value)) {
+      return true;
+    }
+
+    return false;
   }
 }
